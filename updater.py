@@ -16,9 +16,19 @@ class Paper:
     def getBuildsForVersion(self, version: str) -> list:
         req = requests.get('https://papermc.io/api/v1/paper/%s/' % (version), headers={'User-Agent' : "Paper Python"})
         text = json.loads(req.content)
-        return text['builds']['all']
+        return text['builds']
 
     def downloadPaper(self, version: str = '1.15.2', build: str = 'latest'):
+        # Check to see if we've already downloaded the build before saving.
+        builds = self.getBuildsForVersion(version)
+        latest_build = builds['latest']
+
+        if (os.path.isfile('builds/paper-%s.jar' % (str(latest_build)))):
+            print("Build '%s' already exists in /builds." % (build))
+            return
+
+        # If build doesn't exist in /builds, download it.
+        print('Build does not exist in /builds, downloading now.')
         url = "https://papermc.io/api/v1/paper/%s/%s/download" % (version, build)
         r = requests.get(url, allow_redirects=True)
         open('builds/' + re.findall("filename=(.+)", r.headers['content-disposition'])[0], 'wb').write(r.content)
@@ -34,6 +44,7 @@ def copyPaperRecursively(root_dir):
         full_dir = root_dir + dir
         print(full_dir)
         copyfile('paper.jar', full_dir + '/paper.jar')
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(prog='paper-updater', description='Paper Minecraft Server Helper', epilog='If no arguments are given, the latest version of Paper will automatically be downloaded.')
@@ -51,7 +62,7 @@ if __name__ == "__main__":
         quit()
 
     if args.builds:
-        print('\n'.join(paper.getBuildsForVersion(args.builds)))
+        print('\n'.join(paper.getBuildsForVersion(args.builds)['all']))
         quit()
 
     build_dir = 'builds'
