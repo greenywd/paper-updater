@@ -1,44 +1,27 @@
 #!/usr/bin/python3
 
 import requests
-import sys
 import os
 import argparse
 import json
-import urllib.request
+import re
 from shutil import copyfile
 
-def getVersions() -> List:
-    req = urllib.request.Request('https://papermc.io/api/v1/paper/', headers={'User-Agent' : "Paper Python"})
-    con = urllib.request.urlopen( req )
-    text = json.loads(con.read())
-    return text['versions']
+class Paper:
+    def getVersions(self) -> list:
+        req = requests.get('https://papermc.io/api/v1/paper/', headers={'User-Agent' : 'Paper Python'})
+        text = json.loads(req.content)
+        return text['versions']
 
-def getBuildsForVersion(version: str) -> List:
-    req = urllib.request.Request('https://papermc.io/api/v1/paper/%s/' % (version), headers={'User-Agent' : "Paper Python"})
-    con = urllib.request.urlopen( req )
-    text = json.loads(con.read())
-    return text['builds']['all']
+    def getBuildsForVersion(self, version: str) -> list:
+        req = requests.get('https://papermc.io/api/v1/paper/%s/' % (version), headers={'User-Agent' : "Paper Python"})
+        text = json.loads(req.content)
+        return text['builds']['all']
 
-def downloadPaper(version: str = '1.15.2', build: str = 'latest'):
-    link = "https://papermc.io/api/v1/paper/%s/%s/download" % (version, build)
-    file_name = "paper.jar"
-    with open(file_name, "wb") as f:
-        print("Downloading %s" % file_name)
-        response = requests.get(link, stream=True)
-        total_length = response.headers.get('content-length')
-
-        if total_length is None:  # no content length header
-            f.write(response.content)
-        else:
-            dl = 0
-            total_length = int(total_length)
-            for data in response.iter_content(chunk_size=4096):
-                dl += len(data)
-                f.write(data)
-                done = int(50 * dl / total_length)
-                sys.stdout.write("\r[%s%s]" % ('=' * done, ' ' * (50-done)))
-                sys.stdout.flush()
+    def downloadPaper(self, version: str = '1.15.2', build: str = 'latest'):
+        url = "https://papermc.io/api/v1/paper/%s/%s/download" % (version, build)
+        r = requests.get(url, allow_redirects=True)
+        open('builds/' + re.findall("filename=(.+)", r.headers['content-disposition'])[0], 'wb').write(r.content)
 
 
 def copyPaper(dir):
@@ -57,13 +40,23 @@ if __name__ == "__main__":
     parser.add_argument('-d', '--server-dir', type=str, help='Full directory of the Paper Server to be updated')
     parser.add_argument('-r', '--recursive', action='store_true', help='Update paper in every directory located inside of -d/--server-dir')
     parser.add_argument('-v', '--versions', action='store_true', help='List versions of the Paper Minecraft Server')
+    parser.add_argument('-b', '--builds', type=str, help='List builds of a specfic version of the Paper Minecraft Server')
     parser.add_argument('-o', '--output-file', action='store_true', help='Filename that will be given to the server jar. Default is paper.jar.')
     args = parser.parse_args()
 
-    print(args.server_dir)
+    paper = Paper()
 
     if args.versions:
-        print('\n'.join(getVersions()))
+        print('\n'.join(paper.getVersions()))
         quit()
-    # downloadPaper(versions[0])
+
+    if args.builds:
+        print('\n'.join(paper.getBuildsForVersion(args.builds)))
+        quit()
+
+    build_dir = 'builds'
+    if not os.path.exists(build_dir):
+        os.mkdir(build_dir)
+
+    paper.downloadPaper()
     # copyPaper()
