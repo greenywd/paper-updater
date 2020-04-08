@@ -8,19 +8,19 @@ import json
 import urllib.request
 from shutil import copyfile
 
-def getVersions():
+def getVersions() -> List:
     req = urllib.request.Request('https://papermc.io/api/v1/paper/', headers={'User-Agent' : "Paper Python"})
     con = urllib.request.urlopen( req )
     text = json.loads(con.read())
     return text['versions']
 
-def getBuildsForVersion(version):
+def getBuildsForVersion(version: str) -> List:
     req = urllib.request.Request('https://papermc.io/api/v1/paper/%s/' % (version), headers={'User-Agent' : "Paper Python"})
     con = urllib.request.urlopen( req )
     text = json.loads(con.read())
     return text['builds']['all']
 
-def downloadPaper(version='1.15.2', build='latest'):
+def downloadPaper(version: str = '1.15.2', build: str = 'latest'):
     link = "https://papermc.io/api/v1/paper/%s/%s/download" % (version, build)
     file_name = "paper.jar"
     with open(file_name, "wb") as f:
@@ -57,7 +57,7 @@ if __name__ == "__main__":
     parser.add_argument('-d', '--server-dir', type=str, help='Full directory of the Paper Server to be updated')
     parser.add_argument('-r', '--recursive', action='store_true', help='Update paper in every directory located inside of -d/--server-dir')
     parser.add_argument('-v', '--versions', action='store_true', help='List versions of the Paper Minecraft Server')
-
+    parser.add_argument('-o', '--output-file', action='store_true', help='Filename that will be given to the server jar. Default is paper.jar.')
     args = parser.parse_args()
 
     print(args.server_dir)
