@@ -39,12 +39,18 @@ class Paper:
 
 
 def copyLatestPaper(dest: str, version: str = '1.15.2', output: str = 'paper.jar'):
+    if (output == None):
+        output = 'paper.jar'
+
     # Get the latest downloaded build of Paper and copy it to '<dest>/paper.jar'
     dir_path = 'builds/%s/' % (version)
     latest_downloaded_build = sorted(os.listdir(dir_path), reverse=True)[0]
     copyfile(dir_path + latest_downloaded_build, dest + output)
 
 def copyLatestPaperRecursively(root_dir: str, version: str = '1.15.2', output: str = 'paper.jar'):
+    if (output == None):
+        output = 'paper.jar'
+        
     dir_path = 'builds/%s/' % (version)
     latest_downloaded_build = sorted(os.listdir(dir_path), reverse=True)[0]
     
@@ -69,7 +75,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     paper = Paper()
-
+    print (args.builds)
     if args.versions:
         print('\n'.join(paper.getVersions()))
         quit()
