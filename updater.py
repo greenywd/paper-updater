@@ -38,13 +38,13 @@ class Paper:
         open(filepath + re.findall("filename=(.+)", r.headers['content-disposition'])[0], 'wb').write(r.content)
 
 
-def copyLatestPaper(dest: str, version: str = '1.15.2'):
+def copyLatestPaper(dest: str, version: str = '1.15.2', output: str = 'paper.jar'):
     # Get the latest downloaded build of Paper and copy it to '<dest>/paper.jar'
     dir_path = 'builds/%s/' % (version)
     latest_downloaded_build = sorted(os.listdir(dir_path), reverse=True)[0]
-    copyfile(dir_path + latest_downloaded_build, dest + 'paper.jar')
+    copyfile(dir_path + latest_downloaded_build, dest + output)
 
-def copyLatestPaperRecursively(root_dir: str, version: str = '1.15.2'):
+def copyLatestPaperRecursively(root_dir: str, version: str = '1.15.2', output: str = 'paper.jar'):
     dir_path = 'builds/%s/' % (version)
     latest_downloaded_build = sorted(os.listdir(dir_path), reverse=True)[0]
     
@@ -56,7 +56,7 @@ def copyLatestPaperRecursively(root_dir: str, version: str = '1.15.2'):
 
     for dir in minecraft_server_dirs:
         full_dir = root_dir + dir
-        copyfile(dir_path + latest_downloaded_build, '%s/paper.jar' % (full_dir))
+        copyfile(dir_path + latest_downloaded_build, '%s/%s' % (full_dir, output))
 
 
 if __name__ == "__main__":
