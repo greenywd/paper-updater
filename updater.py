@@ -44,13 +44,19 @@ def copyLatestPaper(dest: str, version: str = '1.15.2'):
     latest_downloaded_build = sorted(os.listdir(dir_path), reverse=True)[0]
     copyfile(dir_path + latest_downloaded_build, dest + 'paper.jar')
 
-def copyPaperRecursively(root_dir):
+def copyLatestPaperRecursively(root_dir: str, version: str = '1.15.2'):
+    dir_path = 'builds/%s/' % (version)
+    latest_downloaded_build = sorted(os.listdir(dir_path), reverse=True)[0]
+    
+    # Add a trailing / if one isn't given
+    if (root_dir[-1:] != '/'):
+        root_dir += '/'
+
     minecraft_server_dirs = next(os.walk(root_dir))[1]
 
     for dir in minecraft_server_dirs:
         full_dir = root_dir + dir
-        print(full_dir)
-        copyfile('paper.jar', full_dir + '/paper.jar')
+        copyfile(dir_path + latest_downloaded_build, '%s/paper.jar' % (full_dir))
 
 
 if __name__ == "__main__":
@@ -76,5 +82,5 @@ if __name__ == "__main__":
     if args.server_dir:
         server_dir = args.server_dir
 
-        
-    paper.downloadPaper('1.15.2')
+        if args.recursive:
+            copyLatestPaperRecursively(server_dir)
