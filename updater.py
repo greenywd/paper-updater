@@ -27,14 +27,22 @@ class Paper:
             raise FileExistsError("Build '%s' already exists in /builds." % (build))
 
         # If build doesn't exist in /builds, download it.
-        print('Build does not exist in /builds, downloading now.')
+        print('Build does not exist in builds/%s/, downloading now.' % (version))
         url = "https://papermc.io/api/v1/paper/%s/%s/download" % (version, build)
         r = requests.get(url, allow_redirects=True)
-        open('builds/' + re.findall("filename=(.+)", r.headers['content-disposition'])[0], 'wb').write(r.content)
+        filepath = 'builds/%s/' % (version)
+
+        if not os.path.exists(filepath):
+            os.makedirs(filepath, exist_ok=True)
+
+        open(filepath + re.findall("filename=(.+)", r.headers['content-disposition'])[0], 'wb').write(r.content)
 
 
-def copyPaper(dir):
-    copyfile('paper.jar', dir + '/paper.jar')
+def copyLatestPaper(dest: str, version: str = '1.15.2'):
+    # Get the latest downloaded build of Paper and copy it to '<dest>/paper.jar'
+    dir_path = 'builds/%s/' % (version)
+    latest_downloaded_build = sorted(os.listdir(dir_path), reverse=True)[0]
+    copyfile(dir_path + latest_downloaded_build, dest + 'paper.jar')
 
 def copyPaperRecursively(root_dir):
     minecraft_server_dirs = next(os.walk(root_dir))[1]
@@ -64,16 +72,9 @@ if __name__ == "__main__":
         print('\n'.join(paper.getBuildsForVersion(args.builds)['all']))
         quit()
 
-    # ---------------- Updating Paper ----------------
+    # ---------------- Updating Paper ---------------- #
     if args.server_dir:
         server_dir = args.server_dir
 
-        build_dir = 'builds'
-        if not os.path.exists(build_dir):
-            os.mkdir(build_dir)
-
-        try:
-            paper.downloadPaper()
-        except FileExistsError as err:
-            print(err)
-    # copyPaper()
+        
+    paper.downloadPaper('1.15.2')
