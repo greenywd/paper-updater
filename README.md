@@ -1,5 +1,5 @@
 # Paper Updater
-Small Python 3 script to automatically update the [Paper](https://papermc.io/) server jar.
+Small Python 3 script to automatically update the [Paper](https://papermc.io/) server jar. I host a few Minecraft servers for friends and after a few weeks I found out that it's a pain keeping them up to date - especially when there can be multiple updates a day! This is still a huge WIP, but hopefully it's something that simplifies my life a bit (and maybe yours!).
 
 ## Usage
 ```
@@ -26,3 +26,9 @@ optional arguments:
 
 If no arguments are given, the latest version of Paper will automatically be downloaded but not moved.
 ```
+
+## To-Do
+- Specify specific version of Paper to install to --server-dir
+- Clean builds folder (keep latest x builds of each version)
+- Keep track of what --server-dir has what version/build installed
+- Use rcon to automatically restart the server after installing the new jar
