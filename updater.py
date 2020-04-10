@@ -87,6 +87,29 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     paper = Paper()
+    
+    # ---------------- Dont use --recursive without --server-dir! ---------------- #
+    if args.recursive and not args.server_dir:
+        print('Unable to use --recursive without --server-dir. Please specify --server-dir when attempting to use --recursive.')
+        quit()
+
+    # ---------------- Updating Paper ---------------- #
+    if args.server_dir:
+        server_dir = args.server_dir
+
+        try:
+            paper.downloadPaper()
+        except:
+            print('Already downloaded the latest build...')
+
+        print('Copying paper jar...')
+        if args.recursive:
+            paper.copyLatestPaperRecursively(server_dir)
+        else:
+            paper.copyLatestPaper(server_dir)
+
+        print('Done!')
+        quit()
 
     # ---------------- List versions of Paper ---------------- #
     if args.show_versions:
@@ -111,24 +134,6 @@ if __name__ == "__main__":
     # ---------------- Download latest build of Paper ---------------- #
     if args.download_only:
         paper.downloadPaper(version=args.download_only)
-
-    # ---------------- Updating Paper ---------------- #
-    if args.server_dir:
-        server_dir = args.server_dir
-
-        try:
-            paper.downloadPaper()
-        except:
-            print('Already downloaded the latest build...')
-
-        print('Copying paper jar...')
-        if args.recursive:
-            paper.copyLatestPaperRecursively(server_dir)
-        else:
-            paper.copyLatestPaper(server_dir)
-
-        print('Done!')
-        quit()
 
     # ---------------- Download latest Paper ---------------- #
     try: 
