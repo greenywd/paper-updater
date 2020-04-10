@@ -43,6 +43,10 @@ class Paper:
         if (output == None):
             output = 'paper.jar'
 
+        # Add a trailing / if one isn't given
+        if (dest[-1:] != '/'):
+            dest += '/'
+
         # Get the latest downloaded build of Paper and copy it to '<dest>/paper.jar'
         dir_path = 'builds/%s/' % (version)
         latest_downloaded_build = sorted(os.listdir(dir_path), reverse=True)[0]
@@ -104,7 +108,6 @@ if __name__ == "__main__":
         print('\n'.join(sorted(os.listdir('builds/%s/' % (args.show_local_builds)), reverse=True)))
         quit()
 
-
     # ---------------- Download latest build of Paper ---------------- #
     if args.download_only:
         paper.downloadPaper(version=args.download_only)
@@ -118,10 +121,14 @@ if __name__ == "__main__":
         except:
             print('Already downloaded the latest build...')
 
+        print('Copying paper jar...')
         if args.recursive:
             paper.copyLatestPaperRecursively(server_dir)
         else:
             paper.copyLatestPaper(server_dir)
+
+        print('Done!')
+        quit()
 
     # ---------------- Download latest Paper ---------------- #
     try: 
