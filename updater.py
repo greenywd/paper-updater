@@ -38,31 +38,31 @@ class Paper:
         open(filepath + re.findall("filename=(.+)", r.headers['content-disposition'])[0], 'wb').write(r.content)
 
 
-def copyLatestPaper(dest: str, version: str = '1.15.2', output: str = 'paper.jar'):
-    if (output == None):
-        output = 'paper.jar'
+    def copyLatestPaper(self, dest: str, version: str = '1.15.2', output: str = 'paper.jar'):
+        if (output == None):
+            output = 'paper.jar'
 
-    # Get the latest downloaded build of Paper and copy it to '<dest>/paper.jar'
-    dir_path = 'builds/%s/' % (version)
-    latest_downloaded_build = sorted(os.listdir(dir_path), reverse=True)[0]
-    copyfile(dir_path + latest_downloaded_build, dest + output)
+        # Get the latest downloaded build of Paper and copy it to '<dest>/paper.jar'
+        dir_path = 'builds/%s/' % (version)
+        latest_downloaded_build = sorted(os.listdir(dir_path), reverse=True)[0]
+        copyfile(dir_path + latest_downloaded_build, dest + output)
 
-def copyLatestPaperRecursively(root_dir: str, version: str = '1.15.2', output: str = 'paper.jar'):
-    if (output == None):
-        output = 'paper.jar'
+    def copyLatestPaperRecursively(self, root_dir: str, version: str = '1.15.2', output: str = 'paper.jar'):
+        if (output == None):
+            output = 'paper.jar'
+            
+        dir_path = 'builds/%s/' % (version)
+        latest_downloaded_build = sorted(os.listdir(dir_path), reverse=True)[0]
         
-    dir_path = 'builds/%s/' % (version)
-    latest_downloaded_build = sorted(os.listdir(dir_path), reverse=True)[0]
-    
-    # Add a trailing / if one isn't given
-    if (root_dir[-1:] != '/'):
-        root_dir += '/'
+        # Add a trailing / if one isn't given
+        if (root_dir[-1:] != '/'):
+            root_dir += '/'
 
-    minecraft_server_dirs = next(os.walk(root_dir))[1]
+        minecraft_server_dirs = next(os.walk(root_dir))[1]
 
-    for dir in minecraft_server_dirs:
-        full_dir = root_dir + dir
-        copyfile(dir_path + latest_downloaded_build, '%s/%s' % (full_dir, output))
+        for dir in minecraft_server_dirs:
+            full_dir = root_dir + dir
+            copyfile(dir_path + latest_downloaded_build, '%s/%s' % (full_dir, output))
 
 
 if __name__ == "__main__":
@@ -89,4 +89,4 @@ if __name__ == "__main__":
         server_dir = args.server_dir
 
         if args.recursive:
-            copyLatestPaperRecursively(server_dir)
+            paper.copyLatestPaperRecursively(server_dir)
