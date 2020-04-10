@@ -75,6 +75,7 @@ class Paper:
 
 
 if __name__ == "__main__":
+    # TODO: Use groups to mutually exclude multiple args
     parser = argparse.ArgumentParser(prog='paper-updater', description='Paper Minecraft Server Helper', epilog='If no arguments are given, the latest version of Paper will automatically be downloaded but not moved.')
     parser.add_argument('--server-dir', type=str, help='Full directory of the Paper Server to be updated', metavar='/home/minecraft/servers/')
     parser.add_argument('-r', '--recursive', action='store_true', help='Update paper in every directory located inside of -d/--server-dir')
