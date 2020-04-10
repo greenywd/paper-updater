@@ -31,4 +31,4 @@ If no arguments are given, the latest version of Paper will automatically be dow
 - Specify specific version of Paper to install to --server-dir
 - Clean builds folder (keep latest x builds of each version)
 - Keep track of what --server-dir has what version/build installed
-- Use rcon to automatically restart the server after installing the new jar
+- Use rcon to automatically restart the server after installing the new jar ([mcrcon](https://pypi.org/project/mcrcon/)?)
