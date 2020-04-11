@@ -98,8 +98,8 @@ if __name__ == "__main__":
     show_group.add_argument('--show-builds', type=str, help='List builds of a specfic version of the Paper Minecraft Server', metavar='version')
     show_group.add_argument('--show-local-versions', action='store_true', help='List downloaded versions of the Paper Minecraft Server')
     show_group.add_argument('--show-local-builds', type=str, help='List downloaded builds of a specfic version of the Paper Minecraft Server', metavar='version')
-    parser.add_argument('--output-file', type=str, help='Filename that will be given to the server jar. Default is paper.jar.', metavar='paper.jar')
-    parser.add_argument('--download-only', type=str, help='Download the latest build of Paper of the specified Minecraft version.', metavar='version')
+    parser.add_argument('-o', '--output-file', type=str, help='Filename that will be given to the server jar. Default is paper.jar.', metavar='paper.jar')
+    parser.add_argument('--download', type=str, help='Download the latest build of Paper of the specified version.', metavar='version')
     args = parser.parse_args()
 
     paper = Paper()
@@ -112,6 +112,10 @@ if __name__ == "__main__":
     # ---------------- Updating Paper ---------------- #
     if args.server_dir:
         server_dir = args.server_dir
+        filename = 'paper.jar'
+
+        if args.output_file:
+            filename = args.output_file
 
         try:
             paper.downloadPaper()
@@ -120,9 +124,9 @@ if __name__ == "__main__":
 
         print('Copying paper jar...')
         if args.recursive:
-            paper.copyLatestPaperRecursively(server_dir)
+            paper.copyLatestPaperRecursively(server_dir, output=filename)
         else:
-            paper.copyLatestPaper(server_dir)
+            paper.copyLatestPaper(server_dir, output=filename)
 
         print('Done!')
         quit()
@@ -156,9 +160,9 @@ if __name__ == "__main__":
         quit()
 
     # ---------------- Download latest build of Paper ---------------- #
-    if args.download_only:
+    if args.download:
         try:
-            paper.downloadPaper(version=args.download_only)
+            paper.downloadPaper(version=args.download)
         except PaperVersionNotFound as e:
             print(e)
         except FileExistsError as e:
