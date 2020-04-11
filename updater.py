@@ -16,7 +16,9 @@ class Paper:
     def getBuildsForVersion(self, version: str) -> list:
         req = requests.get('https://papermc.io/api/v1/paper/%s/' % (version), headers={'User-Agent' : "Paper Python"})
         text = json.loads(req.content)
-        return text['builds']
+        if (req.status_code == 200):
+            return text['builds']
+        return None
 
     def downloadPaper(self, version: str = '1.15.2', build: str = 'latest'):
         # Check to see if we've already downloaded the build before saving.
@@ -122,7 +124,11 @@ if __name__ == "__main__":
 
     # ---------------- List builds of a specific version of Paper ---------------- #
     if args.show_builds:
-        print('\n'.join(paper.getBuildsForVersion(args.show_builds)['all']))
+        builds = paper.getBuildsForVersion(args.show_builds)
+        if (builds is not None):
+            print('\n'.join(builds['all']))
+        else:
+            print('No builds found for version %s.' % (args.show_builds))
         quit()
 
     # ---------------- List downloaded versions of Paper ---------------- #
@@ -132,7 +138,11 @@ if __name__ == "__main__":
 
     # ---------------- List downloaded builds of a specific version of Paper ---------------- #
     if args.show_local_builds:
-        print('\n'.join(sorted(os.listdir('builds/%s/' % (args.show_local_builds)), reverse=True)))
+        dir = 'builds/%s/' % (args.show_local_builds)
+        if (os.path.isdir(dir)):
+            print('\n'.join(sorted(os.listdir(dir), reverse=True)))
+        else:
+            print('No builds for version %s found.' % (args.show_local_builds))
         quit()
 
     # ---------------- Download latest build of Paper ---------------- #
