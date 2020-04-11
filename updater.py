@@ -5,6 +5,7 @@ import os
 import argparse
 import json
 import re
+import sys
 from shutil import copyfile
 
 class PaperError(Exception):
@@ -107,7 +108,7 @@ if __name__ == "__main__":
     # ---------------- Dont use --recursive without --server-dir! ---------------- #
     if args.recursive and not args.server_dir:
         print('Unable to use --recursive without --server-dir. Please specify --server-dir when attempting to use --recursive.')
-        quit()
+        sys.exit(1)
 
     # ---------------- Updating Paper ---------------- #
     if args.server_dir:
@@ -129,12 +130,12 @@ if __name__ == "__main__":
             paper.copyLatestPaper(server_dir, output=filename)
 
         print('Done!')
-        quit()
+        sys.exit()
 
     # ---------------- List versions of Paper ---------------- #
     if args.show_versions:
         print('\n'.join(paper.getVersions()))
-        quit()
+        sys.exit()
 
     # ---------------- List builds of a specific version of Paper ---------------- #
     if args.show_builds:
@@ -143,12 +144,12 @@ if __name__ == "__main__":
             print('\n'.join(builds['all']))
         else:
             print('No builds found for version %s.' % (args.show_builds))
-        quit()
+        sys.exit()
 
     # ---------------- List downloaded versions of Paper ---------------- #
     if args.show_local_versions:
         print('\n'.join(sorted(os.listdir('builds/'), reverse=True)))
-        quit()
+        sys.exit()
 
     # ---------------- List downloaded builds of a specific version of Paper ---------------- #
     if args.show_local_builds:
@@ -157,7 +158,7 @@ if __name__ == "__main__":
             print('\n'.join(sorted(os.listdir(dir), reverse=True)))
         else:
             print('No builds for version %s found.' % (args.show_local_builds))
-        quit()
+        sys.exit()
 
     # ---------------- Download latest build of Paper ---------------- #
     if args.download:
