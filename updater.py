@@ -7,6 +7,13 @@ import json
 import re
 from shutil import copyfile
 
+class PaperError(Exception):
+    pass
+
+class PaperVersionNotFound(PaperError):
+    def __init__(self, message):
+        self.message = message
+
 class Paper:
     def getVersions(self) -> list:
         req = requests.get('https://papermc.io/api/v1/paper/', headers={'User-Agent' : 'Paper Python'})
@@ -23,6 +30,9 @@ class Paper:
     def downloadPaper(self, version: str = '1.15.2', build: str = 'latest'):
         # Check to see if we've already downloaded the build before saving.
         builds = self.getBuildsForVersion(version)
+        if (builds is None):
+            raise PaperVersionNotFound('No builds for version %s found.' % (version))
+
         latest_build = builds['latest']
 
         if (os.path.isfile('builds/%s/paper-%s.jar' % (version, str(latest_build)))):
@@ -149,7 +159,9 @@ if __name__ == "__main__":
     if args.download_only:
         try:
             paper.downloadPaper(version=args.download_only)
-        except:
+        except PaperVersionNotFound as e:
+            print(e)
+        except FileExistsError as e:
             print('Already downloaded the latest build.')
 
 
