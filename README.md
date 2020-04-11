@@ -41,7 +41,7 @@ This will grab the latest Paper build and place it in each folder located in `/m
 #### Update Paper with a specific filename
 Appending `-o` or `--output-file` will rename `paper.jar` upon moving it into the server directory.
 
-`python updater.py --server-dir /minecraft/servers/server-1/ -o "paper-server.jar`
+`python updater.py --server-dir /minecraft/servers/server-1/ -o "paper-server.jar"`
 
 Result:
 `/minecraft/servers/server-1/paper-server.jar`
