@@ -55,10 +55,10 @@ class Paper:
     def copyLatestPaperRecursively(self, root_dir: str, version: str = '1.15.2', output: str = 'paper.jar'):
         if (output == None):
             output = 'paper.jar'
-            
+
         dir_path = 'builds/%s/' % (version)
         latest_downloaded_build = sorted(os.listdir(dir_path), reverse=True)[0]
-        
+
         # Add a trailing / if one isn't given
         if (root_dir[-1:] != '/'):
             root_dir += '/'
@@ -76,19 +76,22 @@ class Paper:
 
 if __name__ == "__main__":
     # TODO: Use groups to mutually exclude multiple args
+
     parser = argparse.ArgumentParser(prog='paper-updater', description='Paper Minecraft Server Helper', epilog='If no arguments are given, the latest version of Paper will automatically be downloaded but not moved.')
+    show_group = parser.add_mutually_exclusive_group()
+
     parser.add_argument('--server-dir', type=str, help='Full directory of the Paper Server to be updated', metavar='/home/minecraft/servers/')
     parser.add_argument('-r', '--recursive', action='store_true', help='Update paper in every directory located inside of -d/--server-dir')
-    parser.add_argument('--show-versions', action='store_true', help='List versions of the Paper Minecraft Server')
-    parser.add_argument('--show-builds', type=str, help='List builds of a specfic version of the Paper Minecraft Server', metavar='version')
-    parser.add_argument('--show-local-versions', action='store_true', help='List downloaded versions of the Paper Minecraft Server')
-    parser.add_argument('--show-local-builds', type=str, help='List downloaded builds of a specfic version of the Paper Minecraft Server', metavar='version')
+    show_group.add_argument('--show-versions', action='store_true', help='List versions of the Paper Minecraft Server')
+    show_group.add_argument('--show-builds', type=str, help='List builds of a specfic version of the Paper Minecraft Server', metavar='version')
+    show_group.add_argument('--show-local-versions', action='store_true', help='List downloaded versions of the Paper Minecraft Server')
+    show_group.add_argument('--show-local-builds', type=str, help='List downloaded builds of a specfic version of the Paper Minecraft Server', metavar='version')
     parser.add_argument('--output-file', type=str, help='Filename that will be given to the server jar. Default is paper.jar.', metavar='paper.jar')
     parser.add_argument('--download-only', type=str, help='Download the latest build of Paper of the specified Minecraft version.', metavar='version')
     args = parser.parse_args()
 
     paper = Paper()
-    
+
     # ---------------- Dont use --recursive without --server-dir! ---------------- #
     if args.recursive and not args.server_dir:
         print('Unable to use --recursive without --server-dir. Please specify --server-dir when attempting to use --recursive.')
@@ -134,10 +137,16 @@ if __name__ == "__main__":
 
     # ---------------- Download latest build of Paper ---------------- #
     if args.download_only:
-        paper.downloadPaper(version=args.download_only)
+        try:
+            paper.downloadPaper(version=args.download_only)
+        except:
+            print('Already downloaded the latest build.')
 
-    # ---------------- Download latest Paper ---------------- #
-    try: 
-        paper.downloadPaper()
-    except:
-        print('Already downloaded the latest build.')
+
+
+
+
+
+
+
+            
