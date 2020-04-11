@@ -71,7 +71,7 @@ Result:
 ...
 ```
 
-#### Display download
+#### Display downloaded versions/builds
 `python updater.py --show-local-versions`
 ```
 1.15.2
