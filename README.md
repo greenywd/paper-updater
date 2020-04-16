@@ -4,7 +4,7 @@ Small Python 3 script to automatically update the [Paper](https://papermc.io/) s
 ## Usage
 ```
 └ ./updater.py -h
-usage: paper-updater [-h] [--server-dir /home/minecraft/servers/] [-r | --restart '192.168.1.1' '25575' 'password'  --show-versions | --show-builds version | --show-local-versions | --show-local-builds version] [-o paper.jar] [--download version]
+usage: paper-updater [-h] [--server-dir /home/minecraft/servers/] [-r | --restart '192.168.1.1' '25575' 'password'  --show-versions | --show-builds version | --show-local-versions | --show-local-builds version] [-o paper.jar] [--download version [version ...]]
 
 Paper Minecraft Server Helper
 
@@ -24,7 +24,8 @@ optional arguments:
                         List downloaded builds of a specfic version of the Paper Minecraft Server
   -o paper.jar, --output-file paper.jar
                         Filename that will be given to the server jar. Default is paper.jar.
-  --download version    Download the latest build of Paper of the specified version.
+  --download version [version ...]
+                        Download the latest build of Paper of the specified version.
 
 If no arguments are given, paper-updater will not do anything.
 ```
