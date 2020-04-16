@@ -26,7 +26,7 @@ optional arguments:
                         Filename that will be given to the server jar. Default is paper.jar.
   --download version    Download the latest build of Paper of the specified version.
 
-If no arguments are given, the latest version of Paper will automatically be downloaded but not moved.
+If no arguments are given, paper-updater will not do anything.
 ```
 
 ## Examples
@@ -60,6 +60,11 @@ Note: `/restart` isn't recommended by one of the Paper developers [here](https:/
 
 #### Download the latest build of a specific version
 `./updater.py --download 1.15.2`
+
+#### Download a specific build of a specific version
+`./updater.py --download 1.15.2 184`
+
+Note: Attempting to download a build later than latest will download the latest build instead. 
 
 #### Display all versions of the Paper server
 `./updater.py --show-versions`
