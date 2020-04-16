@@ -3,8 +3,8 @@ Small Python 3 script to automatically update the [Paper](https://papermc.io/) s
 
 ## Usage
 ```
-└ python updater.py -h                        
-usage: paper-updater [-h] [--server-dir /home/minecraft/servers/] [-r] [--show-versions | --show-builds version | --show-local-versions | --show-local-builds version] [-o paper.jar] [--download version]
+└ ./updater.py -h
+usage: paper-updater [-h] [--server-dir /home/minecraft/servers/] [-r | --restart '192.168.1.1' '25575' 'password'  --show-versions | --show-builds version | --show-local-versions | --show-local-builds version] [-o paper.jar] [--download version]
 
 Paper Minecraft Server Helper
 
@@ -13,6 +13,8 @@ optional arguments:
   --server-dir /home/minecraft/servers/
                         Full directory of the Paper Server to be updated
   -r, --recursive       Update paper in every directory located inside of -d/--server-dir
+  --restart '192.168.1.1' '25575' 'password'
+                        Restart the server after updating by calling /restart. Only works if you have restart-script specified in spigot.yml otherwise server will fail to restart, and rcon configured.
   --show-versions       List versions of the Paper Minecraft Server
   --show-builds version
                         List builds of a specfic version of the Paper Minecraft Server
@@ -29,28 +31,38 @@ If no arguments are given, the latest version of Paper will automatically be dow
 
 ## Examples
 #### Update Paper for a specific server
-`python updater.py --server-dir /minecraft/servers/server-1/`
+`./updater.py --server-dir /minecraft/servers/server-1/`
 
 This will grab the latest Paper build and place it in `/minecraft/servers/server-1/`.
 
 #### Update Paper for all servers in a directory
-`python updater.py --server-dir /minecraft/servers/ -r`
+`./updater.py --server-dir /minecraft/servers/ -r`
 
 This will grab the latest Paper build and place it in each folder located in `/minecraft/servers/`, i.e. `/minecraft/servers/server-1/paper.jar`, `/minecraft/servers/server-2/paper.jar`
 
 #### Update Paper with a specific filename
 Appending `-o` or `--output-file` will rename `paper.jar` upon moving it into the server directory.
 
-`python updater.py --server-dir /minecraft/servers/server-1/ -o "paper-server.jar"`
+`./updater.py --server-dir /minecraft/servers/server-1/ -o "paper-server.jar"`
 
 Result:
 `/minecraft/servers/server-1/paper-server.jar`
 
+#### Restart Paper after updating
+The server can be restarted after updating by making use of [rcon](https://wiki.vg/RCON) and [Spigot's restart command](https://www.spigotmc.org/wiki/spigot-configuration/).
+
+`--restart` takes three arguments, `<server_ip>`, `<rcon_port>` and `<password>`.
+
+`./updater.py --server-dir /minecraft/servers/server-1/ --restart '192.168.1.1' '25575' 'password'`
+
+Note: `/restart` isn't recommended by one of the Paper developers [here](https://github.com/PaperMC/Paper/issues/1559#issuecomment-428917299). I assume it's still the case now, but it's the only way I could semi-reliably implement restarting. Due to this, `--restart` isn't compatible with `--recursive` to avoid servers not starting up, left in limbo, or worse.
+
+
 #### Download the latest build of a specific version
-`python updater.py --download 1.15.2`
+`./updater.py --download 1.15.2`
 
 #### Display all versions of the Paper server
-`python updater.py --show-versions`
+`./updater.py --show-versions`
 ```
 1.15.2
 1.15.1
@@ -61,7 +73,7 @@ Result:
 ```
 
 #### Display all builds of a specific version
-`python updater.py --show-builds 1.15.2`
+`./updater.py --show-builds 1.15.2`
 ```
 170                                 
 169                                 
@@ -72,12 +84,12 @@ Result:
 ```
 
 #### Display downloaded versions/builds
-`python updater.py --show-local-versions`
+`./updater.py --show-local-versions`
 ```
 1.15.2
 1.14.4
 ```
-`python updater.py --show-local-builds 1.15.2`
+`./updater.py --show-local-builds 1.15.2`
 ```
 paper-170.jar
 paper-168.jar
@@ -89,4 +101,3 @@ paper-165.jar
 - Download specific build of version (partially implemented)
 - Clean builds folder (keep latest x builds of each version)
 - Keep track of what --server-dir has what version/build installed
-- Use rcon to automatically restart the server after installing the new jar ([mcrcon](https://pypi.org/project/mcrcon/)?)

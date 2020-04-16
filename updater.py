@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python
 
 import requests
 import os
@@ -6,6 +6,7 @@ import argparse
 import json
 import re
 import sys
+from mcrcon import MCRcon
 from shutil import copyfile
 
 class PaperError(Exception):
@@ -86,15 +87,26 @@ class Paper:
     def cleanupBuilds(self, keep_latest: int = 3):
         pass
 
+    def restartServer(self, server_ip: str, rconport: int, rconpassword: str):
+        ip_re = re.match(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$",server_ip)
+
+        if not ip_re:
+            raise ValueError('server_ip should be formatted as an IP address (i.e. 192.168.1.1).')
+
+        with MCRcon(server_ip, rconpassword, rconport) as mcr:
+            resp = mcr.command("restart")
+
 
 if __name__ == "__main__":
     # TODO: Use groups to mutually exclude multiple args
 
     parser = argparse.ArgumentParser(prog='paper-updater', description='Paper Minecraft Server Helper', epilog='If no arguments are given, the latest version of Paper will automatically be downloaded but not moved.')
     show_group = parser.add_mutually_exclusive_group()
+    restart_recursive_group = parser.add_mutually_exclusive_group()
 
     parser.add_argument('--server-dir', type=str, help='Full directory of the Paper Server to be updated', metavar='/home/minecraft/servers/')
-    parser.add_argument('-r', '--recursive', action='store_true', help='Update paper in every directory located inside of -d/--server-dir')
+    restart_recursive_group.add_argument('-r', '--recursive', action='store_true', help='Update paper in every directory located inside of -d/--server-dir')
+    restart_recursive_group.add_argument('--restart', nargs=3, type=str, help='Restart the server after updating by calling /restart. Only works if you have restart-script specified in spigot.yml otherwise server will fail to restart, and rcon configured.', metavar=("'192.168.1.1'", "'25575'", "'password'"))
     show_group.add_argument('--show-versions', action='store_true', help='List versions of the Paper Minecraft Server')
     show_group.add_argument('--show-builds', type=str, help='List builds of a specfic version of the Paper Minecraft Server', metavar='version')
     show_group.add_argument('--show-local-versions', action='store_true', help='List downloaded versions of the Paper Minecraft Server')
@@ -108,6 +120,11 @@ if __name__ == "__main__":
     # ---------------- Dont use --recursive without --server-dir! ---------------- #
     if args.recursive and not args.server_dir:
         print('Unable to use --recursive without --server-dir. Please specify --server-dir when attempting to use --recursive.')
+        sys.exit(1)
+
+    # ---------------- Dont use --restart without --server-dir! ---------------- #
+    if args.restart and not args.server_dir:
+        print('Unable to use --restart without --server-dir. Please specify --server-dir when attempting to use --restart.')
         sys.exit(1)
 
     # ---------------- Updating Paper ---------------- #
@@ -128,6 +145,10 @@ if __name__ == "__main__":
             paper.copyLatestPaperRecursively(server_dir, output=filename)
         else:
             paper.copyLatestPaper(server_dir, output=filename)
+
+            if args.restart:
+                print('Restarting server on %s with rcon port %s' % (args.restart[0], args.restart[1]))
+                paper.restartServer(args.restart[0], int(args.restart[1]), args.restart[2])
 
         print('Done!')
         sys.exit()
@@ -168,12 +189,3 @@ if __name__ == "__main__":
             print(e)
         except FileExistsError as e:
             print('Already downloaded the latest build.')
-
-
-
-
-
-
-
-
-            
