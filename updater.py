@@ -118,7 +118,7 @@ class Paper:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(prog='paper-updater', description='Paper Minecraft Server Helper', epilog='If no arguments are given, the latest version of Paper will automatically be downloaded but not moved.')
+    parser = argparse.ArgumentParser(prog='paper-updater', description='Paper Minecraft Server Helper', epilog='If no arguments are given, paper-updater will not do anything.')
     show_group = parser.add_mutually_exclusive_group()
     restart_recursive_group = parser.add_mutually_exclusive_group()
 
