@@ -37,6 +37,7 @@ class Paper:
 
         build_to_download = builds['latest']
 
+        # TODO: If `build` is later than latest, FileExistsError is raised as it's defaulting back to 'latest'. Need to make clear that is what's happening.
         if (build != 'latest'):
             all_builds = builds['all']
 
