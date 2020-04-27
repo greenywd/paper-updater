@@ -104,7 +104,7 @@ class Paper:
             builds_to_delete = builds[:-keep_latest]
 
             for build in builds_to_delete:
-                print(version + '/' + build)
+                os.remove(version + '/' + build)
 
     
     def restartServer(self, server_ip: str, rconport: int, rconpassword: str):
@@ -131,6 +131,7 @@ if __name__ == "__main__":
     show_group.add_argument('--show-local-builds', type=str, help='List downloaded builds of a specfic version of the Paper Minecraft Server', metavar='version')
     parser.add_argument('-o', '--output-file', type=str, help='Filename that will be given to the server jar. Default is paper.jar.', metavar='paper.jar')
     parser.add_argument('--download', type=str, nargs=argparse.ONE_OR_MORE, help='Download the latest build of Paper of the specified version.', metavar='version')
+    parser.add_argument('--clean', type=int, nargs=1, help='Cleanup old builds, while keeping x number of builds as defined by the argument. Default is 3,', metavar=3)
     args = parser.parse_args()
 
     paper = Paper()
@@ -144,6 +145,10 @@ if __name__ == "__main__":
     if args.restart and not args.server_dir:
         print('Unable to use --restart without --server-dir. Please specify --server-dir when attempting to use --restart.')
         sys.exit(1)
+
+    if args.clean:
+        paper.cleanupBuilds(keep_latest=args.clean[0])
+        print('Done!')
 
     # ---------------- Updating Paper ---------------- #
     if args.server_dir:
@@ -200,27 +205,26 @@ if __name__ == "__main__":
         sys.exit()
 
     # ---------------- Download latest build of Paper ---------------- #
-    if len(args.download) < 3:
-        # If only version provided, download latest build. Otherwise, download the specified build of version.
-        if (len(args.download) == 1):
-            try:
-                paper.downloadPaper(version=args.download[0])
-            except PaperVersionNotFound as e:
-                print(e)
-            except FileExistsError as e:
-                print('Already downloaded the latest build.')
-        elif (len(args.download) == 2):
-            try:
-                paper.downloadPaper(version=args.download[0], build=args.download[1])
-            except PaperVersionNotFound as e:
-                print(e)
-            except FileExistsError as e:
-                print('Already downloaded the specified build.')
+    if (args.download):
+        if len(args.download) < 3:
+            # If only version provided, download latest build. Otherwise, download the specified build of version.
+            if (len(args.download) == 1):
+                try:
+                    paper.downloadPaper(version=args.download[0])
+                except PaperVersionNotFound as e:
+                    print(e)
+                except FileExistsError as e:
+                    print('Already downloaded the latest build.')
+            elif (len(args.download) == 2):
+                try:
+                    paper.downloadPaper(version=args.download[0], build=args.download[1])
+                except PaperVersionNotFound as e:
+                    print(e)
+                except FileExistsError as e:
+                    print('Already downloaded the specified build.')
 
-        sys.exit()
+            sys.exit()
 
-    else:
-        print('Too many arguments provided.')
-        sys.exit(1)
-
-    paper.cleanupBuilds(keep_latest=1)
+        else:
+            print('Too many arguments provided.')
+            sys.exit(1)
