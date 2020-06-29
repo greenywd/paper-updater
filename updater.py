@@ -29,7 +29,7 @@ class Paper:
             return text['builds']
         return None
 
-    def downloadPaper(self, version: str = '1.15.2', build: str = 'latest'):
+    def downloadPaper(self, version: str = '1.16.1', build: str = 'latest'):
         # Check to see if we've already downloaded the build before saving.
         builds = self.getBuildsForVersion(version)
         if (builds is None):
@@ -60,7 +60,7 @@ class Paper:
         open(filepath + re.findall("filename=(.+)", r.headers['content-disposition'])[0], 'wb').write(r.content)
 
 
-    def copyLatestPaper(self, dest: str, version: str = '1.15.2', output: str = 'paper.jar'):
+    def copyLatestPaper(self, dest: str, version: str = '1.16.1', output: str = 'paper.jar'):
         if (output == None):
             output = 'paper.jar'
 
@@ -70,15 +70,24 @@ class Paper:
 
         # Get the latest downloaded build of Paper and copy it to '<dest>/paper.jar'
         dir_path = 'builds/%s/' % (version)
-        latest_downloaded_build = sorted(os.listdir(dir_path), reverse=True)[0]
-        copyfile(dir_path + latest_downloaded_build, dest + output)
 
-    def copyLatestPaperRecursively(self, root_dir: str, version: str = '1.15.2', output: str = 'paper.jar'):
+        builds = self.__getBuildFromFilenames(os.listdir(dir_path))
+
+        latest_downloaded_build = sorted(builds, reverse=True, key=int)[0]
+
+        build_filename = "paper-%s.jar" %(latest_downloaded_build)
+        copyfile(dir_path + build_filename, dest + output)
+
+    def copyLatestPaperRecursively(self, root_dir: str, version: str = '1.16.1', output: str = 'paper.jar'):
         if (output == None):
             output = 'paper.jar'
 
         dir_path = 'builds/%s/' % (version)
-        latest_downloaded_build = sorted(os.listdir(dir_path), reverse=True)[0]
+        builds = self.__getBuildFromFilenames(os.listdir(dir_path))
+
+        latest_downloaded_build = sorted(builds, reverse=True, key=int)[0]
+
+        build_filename = "paper-%s.jar" %(latest_downloaded_build)
 
         # Add a trailing / if one isn't given
         if (root_dir[-1:] != '/'):
@@ -88,7 +97,7 @@ class Paper:
 
         for dir in minecraft_server_dirs:
             full_dir = root_dir + dir
-            copyfile(dir_path + latest_downloaded_build, '%s/%s' % (full_dir, output))
+            copyfile(dir_path + build_filename, '%s/%s' % (full_dir, output))
 
     def cleanupBuilds(self, keep_latest: int = 3):
         # Get all versions in a list i.e. ['1.15', '1.15.1', '1.15.2']
@@ -115,6 +124,14 @@ class Paper:
 
         with MCRcon(server_ip, rconpassword, rconport) as mcr:
             resp = mcr.command("restart")
+
+    def __getBuildFromFilenames(self, filelist: list) -> list:
+        new_list = []
+        for item in filelist:
+            if item.startswith('paper-'):
+                new_list.append(item[len('paper-'):-4])
+
+        return new_list
 
 
 if __name__ == "__main__":
